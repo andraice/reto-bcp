@@ -2,6 +2,7 @@ package com.example.retobcp.web;
 
 
 import com.example.retobcp.entity.TipoCambio;
+import com.example.retobcp.request.TipoCambioInsertaRequest;
 import com.example.retobcp.request.TipoCambioRequest;
 import com.example.retobcp.response.TipoCambioResponse;
 import com.example.retobcp.service.TipoCambioService;
@@ -28,12 +29,22 @@ public class ApiController {
     private TipoCambioService tipoCambioService;
 
     @PostMapping(
+            value = "calcula",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public Single<ResponseEntity<TipoCambioResponse>> postTipoCambio(@RequestBody TipoCambioRequest tipoCambioRequest) {
-        System.out.println(tipoCambioRequest.getMonto());
-        return tipoCambioService.getTipoCambio(tipoCambioRequest.getMonto(), tipoCambioRequest.getMonedaOrigen(), tipoCambioRequest.getMonedaDestino())
+        return tipoCambioService.getTipoCambio(tipoCambioRequest.getMonto(), tipoCambioRequest.getMonedaOrigen(), tipoCambioRequest.getMonedaDestino(), tipoCambioRequest.getFecha())
+                .subscribeOn(Schedulers.io())
+                .map(x -> ResponseEntity.ok(x));
+    }
+
+    @PostMapping(
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public Single<ResponseEntity<TipoCambio>> insertarTipoCambio(@RequestBody TipoCambioInsertaRequest tipoCambioInsertaRequest) {
+        return tipoCambioService.insertarTipoCambio(tipoCambioInsertaRequest)
                 .subscribeOn(Schedulers.io())
                 .map(x -> ResponseEntity.ok(x));
     }
